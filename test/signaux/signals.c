@@ -10,7 +10,7 @@ int main (int argc, char** argv) {
 	puts("All signals blocked.");
 	puts("Use SIGTSTP to insert a coin, SIGINT to stop a wheel and SIGQUIT to quit.");
 	puts("reminders :");
-	puts("SIGSTP : CTRL + Z");
+	puts("SIGTSTP : CTRL + Z");
 	puts("SIGINT : CTRL + C");
 	puts("SIGINT : CTRL + \\");
 	puts("kill -s <SIGNAL> <PID>");
