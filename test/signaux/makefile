@@ -1,12 +1,13 @@
 CC = gcc
-FLAGS = -g -Wall -std=c99
+CFLAGS = -g -Wall -std=gnu99
+LDFLAGS = -pthread
 SRCS=$(wildcard *.c)
 OUT=$(SRCS:%.c=%)
 
 all: $(OUT)
 
 %: %.c
-	$(CC) $(FLAGS) $< -o $@
+	$(CC) $(CFLAGS) $< -o $@ $(LDFLAGS)
 
 clean:
 	rm -rf $(OUT) *~ *.dSYM

@@ -4,7 +4,6 @@
 
 int main (int argc, char** argv) {
 	sigset_t mask, maskold;
-	sigemptyset(&mask);
 	sigfillset(&mask);
 	pthread_sigmask(SIG_SETMASK, &mask, &maskold);
 	puts("All signals blocked.");
@@ -12,7 +11,7 @@ int main (int argc, char** argv) {
 	puts("reminders :");
 	puts("SIGTSTP : CTRL + Z");
 	puts("SIGINT : CTRL + C");
-	puts("SIGINT : CTRL + \\");
+	puts("SIGQUIT : CTRL + \\");
 	puts("kill -s <SIGNAL> <PID>");
 	int sig;
 	do {
@@ -24,5 +23,5 @@ int main (int argc, char** argv) {
 		}
 	} while (sig != SIGQUIT);
 	puts("Program terminated.");
-   return EXIT_SUCCESS;
+	return EXIT_SUCCESS;
 }
