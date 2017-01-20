@@ -34,6 +34,7 @@ const int WHEELS_NB = 3;
  * @return the code's exit of program
  */
 int main(int argc, char** argv) {
+	machine_t* machine = new_machine(WHEELS_NB);
 
 	// pthread_t t[WHEELS_NB];
 	// for (int i = 0; i < WHEELS_NB; i++) {
@@ -49,7 +50,7 @@ int main(int argc, char** argv) {
 
 	// control thread creation
 	pthread_t th_control;
-	CHECK_ERR(pthread_create(&th_control, NULL, control_thread, NULL), "pthread_create failed!");
+	CHECK_ERR(pthread_create(&th_control, NULL, control_thread, machine), "pthread_create failed!");
 	CHECK_ERR(pthread_join(th_control, NULL), "pthread_join failed!");
 
 	// for (int i = 0; i < workers_nb; i++) {
@@ -57,5 +58,6 @@ int main(int argc, char** argv) {
 	// }
 	// CHECK_ERR(pthread_join(th_display, NULL), "pthread_join failed!");
 
+	free_machine(machine);
 	return EXIT_SUCCESS;
 }

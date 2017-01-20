@@ -10,9 +10,12 @@ typedef struct {
 } wheel_t;
 
 typedef struct {
-	wheel_t** wheels;
+	wheel_t** wheel;
 	int wheels_nb;
 	int cash;
 } machine_t;
+
+machine_t* new_machine(int size);
+void free_machine(machine_t* machine);
 
 #endif
