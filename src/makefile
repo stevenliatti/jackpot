@@ -1,6 +1,6 @@
 CC=gcc
 CFLAGS=-g -Wall -Wextra -std=gnu99
-LDFLAGS=
+LDFLAGS=-pthread -lpthread
 SRC=$(wildcard *.c)
 OBJ=$(SRC:.c=.o)
 EXEC=jackpot
