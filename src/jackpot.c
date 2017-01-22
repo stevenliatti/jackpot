@@ -12,12 +12,6 @@
  * @version 1.0
  */
 
-#define _GNU_SOURCE
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <pthread.h>
-#include <signal.h>
 #include "../inc/machine.h"
 #include "../inc/control.h"
 
