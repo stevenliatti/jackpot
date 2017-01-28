@@ -1,6 +1,8 @@
 #ifndef _WHEEL_H_
 #define _WHEEL_H_
 
-void* wheel(void* arg);
+#include "logger.h"
+
+void* wheel_thread(void* arg);
 
 #endif
