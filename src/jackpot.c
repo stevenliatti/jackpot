@@ -39,8 +39,8 @@ int main() {
 	pthread_t th_control;
 	CHECK_ERR(pthread_create(&th_control, NULL, control_thread, machine), "pthread_create failed!");
 
-	pthread_t th_display;
-	CHECK_ERR(pthread_create(&th_display, NULL, display_thread, machine), "pthread_create failed!");
+	// pthread_t th_display;
+	// CHECK_ERR(pthread_create(&th_display, NULL, display_thread, machine), "pthread_create failed!");
 	
 	pthread_t th_wheels[WHEELS_NB];
 	for (int i = 0; i < WHEELS_NB; i++) {
@@ -49,8 +49,8 @@ int main() {
 
 	CHECK_ERR(pthread_join(th_control, NULL), "pthread_join failed!");
 	logger(LOG_WARNING, stderr, "after th_control join\n");
-	CHECK_ERR(pthread_join(th_display, NULL), "pthread_join failed!");
-	logger(LOG_WARNING, stderr, "after th_display join\n");
+	// CHECK_ERR(pthread_join(th_display, NULL), "pthread_join failed!");
+	// logger(LOG_WARNING, stderr, "after th_display join\n");
 	for (int i = 0; i < WHEELS_NB; i++) {
 		CHECK_ERR(pthread_join(th_wheels[i], NULL), "pthread_join failed!");
 		logger(LOG_WARNING, stderr, "after th_wheels[%d] join\n", i);

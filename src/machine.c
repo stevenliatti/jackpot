@@ -11,12 +11,14 @@ machine_t* new_machine(int size) {
 	machine->wheel = malloc(sizeof(wheel_t*) * size);
 	int sleep = BASE_SLEEP;
 	for (int i = 0; i < size; i++) {
-		sleep = i == 0 ? BASE_SLEEP : sleep / 2;
 		machine->wheel[i] = malloc(sizeof(wheel_t));
 		machine->wheel[i]->value = 0;
 		machine->wheel[i]->id = i;
 		machine->wheel[i]->rolling = false;
 		machine->wheel[i]->stop_game = &(machine->stop_game);
+
+		sleep = i == 0 ? BASE_SLEEP : sleep / 2;
+		logger(LOG_DEBUG, stderr, "sleep %d pour wheel %d\n", sleep, machine->wheel[i]->id);
 		machine->wheel[i]->sleep = sleep;
 		machine->wheel[i]->mutex = &(machine->mutex);
 		machine->wheel[i]->cond = &(machine->cond);

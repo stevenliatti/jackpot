@@ -14,7 +14,7 @@
 /**
  * @brief      120 ms of sleep duration
  */
-#define BASE_SLEEP 120000
+#define BASE_SLEEP 4000000
 
 typedef struct {
 	int value;

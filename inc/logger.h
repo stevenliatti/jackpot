@@ -23,7 +23,7 @@
 /**
  * @brief      Le niveau actuel de log.
  */
-#define LOG_LEVEL LOG_WARNING
+#define LOG_LEVEL LOG_DEBUG
 
 void logger(int log_level, FILE *stream, char *format, ...);
 

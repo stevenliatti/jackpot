@@ -15,8 +15,10 @@ void* wheel_thread(void* arg) {
 		pthread_mutex_unlock(wheel->mutex);
 		logger(LOG_DEBUG, stderr, "signal receive in wheel_thread %d\n", wheel->id);
 		logger(LOG_DEBUG, stderr, "from wheel_thread %d, wheel->stop_game (2) : %d\n", wheel->id, *wheel->stop_game);
+
 		while (!*wheel->stop_game && wheel->rolling) {
 			wheel->value = (wheel->value + 1) % 10;
+			logger(LOG_DEBUG, stderr, "wheel value for id %d : %d\n", wheel->id, wheel->value);
 			usleep(wheel->sleep);
 		}
 		logger(LOG_DEBUG, stderr, "Stop rolling in wheel_thread %d, wheel value : %d\n", wheel->id, wheel->value);

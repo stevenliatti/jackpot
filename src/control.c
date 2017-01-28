@@ -27,13 +27,13 @@ void stop_wheel(machine_t* machine) {
 			cnt++;
 		} 
 		if (cnt != machine->wheels_nb) {
-			pthread_mutex_lock(&(machine->mutex));
+			// pthread_mutex_lock(&(machine->mutex)); à revoir
 			machine->wheel[cnt]->rolling = false;
 			logger(LOG_DEBUG, stderr, "Wheel stopped.\n");
 			if (cnt == machine->wheels_nb - 1) {
 				machine->started = false;
 			}
-			pthread_mutex_unlock(&(machine->mutex));
+			// pthread_mutex_unlock(&(machine->mutex));
 		}
 	}
 }
