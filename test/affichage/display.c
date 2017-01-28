@@ -15,7 +15,7 @@ int counters[3] = {0, 0, 0};
 double speed[3] = {1000000, 600000, 300000}; // pour que ça se voit dans le test
 pthread_mutex_t mutexes[3];
 
-void* dispaly_thread(void* arg) {
+void* display_thread(void* arg) {
 	
 	sigset_t mask, maskold;
 	sigfillset(&mask);
@@ -87,12 +87,12 @@ void* play_thread(void* arg) {
 	pthread_sigmask(SIG_SETMASK, &mask, &maskold);
 
 	while (!program_stopped && !wheel_stopped[*index]) {
-		pthread_mutex_lock(&mutexes[*index]);
+		//pthread_mutex_lock(&mutexes[*index]); // pas nécessaire, ou alors je comprends pas pk (Steven)
 		counters[*index]++;
 		if (counters[*index] == 10) {
 			counters[*index] = 0;
 		}
-		pthread_mutex_unlock(&mutexes[*index]);
+		//pthread_mutex_unlock(&mutexes[*index]);
 		usleep(speed[*index]);
 	}
 
@@ -110,8 +110,8 @@ int main (int argc, char** argv) {
 		pthread_mutex_init(&(mutexes[i]), NULL);
 	}
 
-	pthread_t th_dispaly;
-	CHECK_ERR(pthread_create(&th_dispaly, NULL, dispaly_thread, NULL), "th_dispaly pthread_create failed!");
+	pthread_t th_display;
+	CHECK_ERR(pthread_create(&th_display, NULL, display_thread, NULL), "th_display pthread_create failed!");
 
 	pthread_t th_control;
 	CHECK_ERR(pthread_create(&th_control, NULL, control_thread, NULL), "th_control pthread_create failed!");
@@ -125,7 +125,7 @@ int main (int argc, char** argv) {
 
 
 
-	CHECK_ERR(pthread_join(th_dispaly, NULL), "th_dispaly pthread_join failed!");
+	CHECK_ERR(pthread_join(th_display, NULL), "th_display pthread_join failed!");
 	CHECK_ERR(pthread_join(th_control, NULL), "th_control pthread_join failed!");
 	for (int i = 0; i < 3; ++i)	{
 		CHECK_ERR(pthread_join(th_play[i], NULL), "th_play pthread_join failed!");

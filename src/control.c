@@ -5,9 +5,12 @@ void insert_coin(machine_t* machine) {
 	int size = machine->wheels_nb;
 	if (!(machine->started)) {
 		machine->started = true;
+		pthread_mutex_lock(&(machine->mutex));
 		for (int i = 0; i < size; i++) {
 			machine->wheel[i]->rolling = true;
 		}
+		pthread_cond_broadcast(wheel->cond);
+		pthread_mutex_unlock(wheel->mutex);
 		machine->cash++;
 		printf("Coin inserted.\n");
 	}

@@ -13,15 +13,18 @@
 typedef struct {
 	int value;
 	int id;
-	int rolling;
+	bool rolling;
+	pthread_mutex_t* mutex;
+	pthread_cond_t* cond;
 } wheel_t;
 
 typedef struct {
 	wheel_t** wheel;
 	int wheels_nb;
 	int cash;
-	int started;
+	bool started;
 	pthread_mutex_t mutex;
+	pthread_cond_t cond;
 } machine_t;
 
 machine_t* new_machine(int size);
