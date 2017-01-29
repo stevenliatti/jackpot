@@ -12,6 +12,22 @@
 
 #include "../inc/display.h"
 
+/**
+ * Calculation of the real time the thread must sleep (in microseconds).
+ *
+ * @param start time
+ * @param finish time
+ * @return void
+ */
+void adapt_frequency(struct timespec start, struct timespec finish, double uperiod){
+	double elapsed = (finish.tv_sec - start.tv_sec) * 1e6;
+	elapsed += (finish.tv_nsec - start.tv_nsec) / 1e3;
+	if (elapsed < uperiod) {
+		useconds_t uperiod_sleep = uperiod - elapsed;
+		usleep(uperiod_sleep);
+	}
+}
+
 void end_game(machine_t* machine);
 
 /**
@@ -26,6 +42,7 @@ void* display_thread(void* arg) {
 	sigset_t mask, maskold;
 	sigfillset(&mask);
 	pthread_sigmask(SIG_SETMASK, &mask, &maskold);
+	struct timespec start, finish;
 
 	machine_t* machine = (machine_t*) arg;
 	while (!machine->stop_game) {
@@ -52,16 +69,18 @@ void* display_thread(void* arg) {
 		logger(LOG_DEBUG, stderr, "display_thread, machine->started : %d\n", machine->started);
 
 		while (machine->started && !machine->stop_game) {
+			clock_gettime(CLOCK_MONOTONIC, &start);
 			printf("\e[1;1H");
 			printf("Game started!\n");
 			int pos = 1;
 			for (int i = 0; i < machine->wheels_nb; i++) {
 				printf("\e[3;%dH", pos);
 				printf("%d\n", machine->wheels[i]->value);
-				usleep(DISPLAY_PERIOD);
 				pos += 2;
 			}
 			printf("\n");
+			clock_gettime(CLOCK_MONOTONIC, &finish); 
+			adapt_frequency(start, finish, DISPLAY_PERIOD);
 		}
 
 		logger(LOG_DEBUG, stderr, "display_thread, after while machine started\n");
