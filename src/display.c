@@ -12,23 +12,8 @@
 
 #include "../inc/display.h"
 
-/**
- * Calculation of the real time the thread must sleep (in microseconds).
- *
- * @param start time
- * @param finish time
- * @return void
- */
-void adapt_frequency(struct timespec start, struct timespec finish, double uperiod){
-	double elapsed = (finish.tv_sec - start.tv_sec) * 1e6;
-	elapsed += (finish.tv_nsec - start.tv_nsec) / 1e3;
-	if (elapsed < uperiod) {
-		useconds_t uperiod_sleep = uperiod - elapsed;
-		usleep(uperiod_sleep);
-	}
-}
-
 void end_game(machine_t* machine);
+void adapt_frequency(struct timespec start, struct timespec finish, double uperiod);
 
 /**
  * @brief      This function is the display thread. It print all the messages of
@@ -125,4 +110,22 @@ void end_game(machine_t* machine) {
 	machine->cash -= won_coins;
 	printf("You won %d coins\n", won_coins);
 	printf("%d coins left in the machine...\n", machine->cash);
+}
+
+
+/**
+ * @brief      Calculation of the real time the thread must sleep (in
+ *             microseconds).
+ *
+ * @param      start    time
+ * @param      finish   time
+ * @param[in]  uperiod  The uperiod.
+ */
+void adapt_frequency(struct timespec start, struct timespec finish, double uperiod) {
+	double elapsed = (finish.tv_sec - start.tv_sec) * 1e6;
+	elapsed += (finish.tv_nsec - start.tv_nsec) / 1e3;
+	if (elapsed < uperiod) {
+		useconds_t uperiod_sleep = uperiod - elapsed;
+		usleep(uperiod_sleep);
+	}
 }
