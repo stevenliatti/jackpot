@@ -14,6 +14,7 @@
 
 void won_coins_compute(machine_t* machine);
 void adapt_frequency(struct timespec start, struct timespec finish, double uperiod);
+void display_machine(machine_t* machine);
 
 /**
  * @brief      This function is the display thread. It print all the messages of
@@ -53,18 +54,18 @@ void* display_thread(void* arg) {
 
 		while (machine->started && !machine->stop_game) {
 			clock_gettime(CLOCK_MONOTONIC, &start);
-			printf("\e[1;1H");
-			printf("Game started!\n");
-			int pos = 1;
-			for (int i = 0; i < machine->wheels_nb; i++) {
-				printf("\e[3;%dH", pos);
-				printf("%d\n", machine->wheels[i]->value);
-				pos += 2;
-			}
-			printf("\n");
+			display_machine(machine);
 			clock_gettime(CLOCK_MONOTONIC, &finish); 
 			adapt_frequency(start, finish, DISPLAY_PERIOD);
 		}
+
+		//if (!machine->started) {
+			//clock_gettime(CLOCK_MONOTONIC, &start);
+			
+			display_machine(machine);
+			// clock_gettime(CLOCK_MONOTONIC, &finish); 
+			// adapt_frequency(start, finish, DISPLAY_PERIOD);
+		//}
 
 		logger(LOG_DEBUG, stderr, "display_thread, after while machine started\n");
 		if (!machine->stop_game) {
@@ -126,4 +127,17 @@ void adapt_frequency(struct timespec start, struct timespec finish, double uperi
 		useconds_t uperiod_sleep = uperiod - elapsed;
 		usleep(uperiod_sleep);
 	}
+}
+
+
+void display_machine(machine_t* machine) {
+	printf("\e[1;1H");
+	printf("Game started!\n");
+	int pos = 1;
+	for (int i = 0; i < machine->wheels_nb; i++) {
+		printf("\e[3;%dH", pos);
+		printf("%d\n", machine->wheels[i]->value);
+		pos += 2;
+	}
+	printf("\n");
 }
