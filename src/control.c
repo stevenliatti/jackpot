@@ -9,22 +9,19 @@
  */
 void insert_coin(machine_t* machine) {
 	logger(LOG_DEBUG, stderr, "control_thread, In insert_coin\n");
+	machine->cash++;
 	pthread_mutex_lock(&(machine->mutex));
 	machine->new_game = true;
 	machine->started = true;
-	logger(LOG_DEBUG, stderr, "control_thread, machine->started = true\n");
 	for (int i = 0; i < machine->wheels_nb; i++) {
 		machine->wheels[i]->rolling = true;
 		machine->wheels[i]->value = 0;
 	}
 	pthread_cond_broadcast(&(machine->cond));
-	logger(LOG_DEBUG, stderr, "control_thread, after pthread_cond_broadcast\n");
 	alarm(REACTION_TIME);
 	logger(LOG_DEBUG, stderr, "control_thread, insert_coin, alarm set for %d sec\n", REACTION_TIME);
 	pthread_mutex_unlock(&(machine->mutex));
 	logger(LOG_DEBUG, stderr, "control_thread, all wheel rolling\n");
-	machine->cash++;
-	logger(LOG_DEBUG, stderr, "control_thread, Coin inserted.\n");
 }
 
 /**
@@ -50,7 +47,6 @@ void stop_wheel(machine_t* machine) {
 			machine->wheels[cnt]->rolling = false;
 			alarm(REACTION_TIME);
 			logger(LOG_DEBUG, stderr, "control_thread, stop_wheel, alarm restarted with %d sec\n", REACTION_TIME);
-			logger(LOG_DEBUG, stderr, "control_thread, Wheel stopped.\n");
 			if (cnt == machine->wheels_nb - 1) {
 
 				machine->started = false;
@@ -84,7 +80,6 @@ void exit_game(machine_t* machine) {
 	machine->started = true;
 	machine->stop_game = true;
 	pthread_cond_broadcast(&(machine->cond));
-	logger(LOG_DEBUG, stderr, "control_thread, in exit_game, pthread_cond_broadcast\n");
 	pthread_mutex_unlock(&(machine->mutex));
 	logger(LOG_DEBUG, stderr, "control_thread, Game terminated\n");
 }
@@ -103,10 +98,7 @@ void* control_thread(void* arg) {
 	sigset_t mask, maskold;
 	sigfillset(&mask);
 	pthread_sigmask(SIG_SETMASK, &mask, &maskold);
-	logger(LOG_DEBUG, stderr, "Use SIGTSTP to insert a coin, SIGINT to stop a wheel "
-	"and SIGQUIT to quit.\nreminders :\n"
-	"SIGTSTP : CTRL + Z\nSIGINT : CTRL + C\nSIGQUIT : CTRL + \\\n"
-	"kill -s <SIGNAL> %d\n", getpid());
+
 	int sig;
 	do {
 		sigwait(&mask, &sig);

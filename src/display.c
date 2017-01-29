@@ -35,7 +35,6 @@ void* display_thread(void* arg) {
 		pthread_mutex_lock(&(machine->mutex));
 		while (machine->new_game) {
 			pthread_cond_wait(&(machine->cond), &(machine->mutex));
-			logger(LOG_DEBUG, stderr, "display_thread deblocked first cond\n");
 		}
 		pthread_mutex_unlock(&(machine->mutex));
 
@@ -48,7 +47,6 @@ void* display_thread(void* arg) {
 		pthread_mutex_lock(&(machine->mutex));
 		while (!machine->started) {
 			pthread_cond_wait(&(machine->cond), &(machine->mutex));
-			logger(LOG_DEBUG, stderr, "display_thread deblocked second cond\n");
 		}
 		pthread_mutex_unlock(&(machine->mutex));
 		logger(LOG_DEBUG, stderr, "display_thread, machine->started : %d\n", machine->started);

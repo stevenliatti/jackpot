@@ -25,7 +25,7 @@
 /**
  * @brief      The actual log level.
  */
-#define LOG_LEVEL LOG_DEBUG
+#define LOG_LEVEL LOG_ERROR
 
 void logger(int log_level, FILE* stream, char* format, ...);
 
