@@ -28,7 +28,6 @@ void* wheel_thread(void* arg) {
 	pthread_sigmask(SIG_SETMASK, &mask, &maskold);
 
 	wheel_t* wheel = (wheel_t*) arg;
-	logger(LOG_DEBUG, stderr, "In wheel_thread %d\n", wheel->id);
 	logger(LOG_DEBUG, stderr, "from wheel_thread %d, wheel->stop_game : %d\n", wheel->id, *wheel->stop_game);
 	while (!*wheel->stop_game) {
 		logger(LOG_DEBUG, stderr, "In wheel_thread %d, after first while\n", wheel->id);
@@ -38,7 +37,6 @@ void* wheel_thread(void* arg) {
 		}
 		pthread_mutex_unlock(wheel->mutex);
 		logger(LOG_DEBUG, stderr, "signal receive in wheel_thread %d\n", wheel->id);
-		logger(LOG_DEBUG, stderr, "from wheel_thread %d, wheel->stop_game (2) : %d\n", wheel->id, *wheel->stop_game);
 
 		while (!*wheel->stop_game && wheel->rolling) {
 			wheel->value = (wheel->value + 1) % 10;

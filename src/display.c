@@ -13,6 +13,7 @@
 #include "../inc/display.h"
 
 void end_game(machine_t* machine);
+void adapt_frequency(struct timespec start, struct timespec finish, double uperiod);
 
 /**
  * @brief      This function is the display thread. It print all the messages of
@@ -26,6 +27,7 @@ void* display_thread(void* arg) {
 	sigset_t mask, maskold;
 	sigfillset(&mask);
 	pthread_sigmask(SIG_SETMASK, &mask, &maskold);
+	struct timespec start, finish;
 
 	machine_t* machine = (machine_t*) arg;
 	while (!machine->stop_game) {
@@ -33,7 +35,6 @@ void* display_thread(void* arg) {
 		pthread_mutex_lock(&(machine->mutex));
 		while (machine->new_game) {
 			pthread_cond_wait(&(machine->cond), &(machine->mutex));
-			logger(LOG_DEBUG, stderr, "display_thread deblocked first cond\n");
 		}
 		pthread_mutex_unlock(&(machine->mutex));
 
@@ -46,22 +47,23 @@ void* display_thread(void* arg) {
 		pthread_mutex_lock(&(machine->mutex));
 		while (!machine->started) {
 			pthread_cond_wait(&(machine->cond), &(machine->mutex));
-			logger(LOG_DEBUG, stderr, "display_thread deblocked second cond\n");
 		}
 		pthread_mutex_unlock(&(machine->mutex));
 		logger(LOG_DEBUG, stderr, "display_thread, machine->started : %d\n", machine->started);
 
 		while (machine->started && !machine->stop_game) {
+			clock_gettime(CLOCK_MONOTONIC, &start);
 			printf("\e[1;1H");
 			printf("Game started!\n");
 			int pos = 1;
 			for (int i = 0; i < machine->wheels_nb; i++) {
 				printf("\e[3;%dH", pos);
 				printf("%d\n", machine->wheels[i]->value);
-				usleep(DISPLAY_PERIOD);
 				pos += 2;
 			}
 			printf("\n");
+			clock_gettime(CLOCK_MONOTONIC, &finish); 
+			adapt_frequency(start, finish, DISPLAY_PERIOD);
 		}
 
 		logger(LOG_DEBUG, stderr, "display_thread, after while machine started\n");
@@ -106,4 +108,22 @@ void end_game(machine_t* machine) {
 	machine->cash -= won_coins;
 	printf("You won %d coins\n", won_coins);
 	printf("%d coins left in the machine...\n", machine->cash);
+}
+
+
+/**
+ * @brief      Calculation of the real time the thread must sleep (in
+ *             microseconds).
+ *
+ * @param      start    time
+ * @param      finish   time
+ * @param[in]  uperiod  The uperiod.
+ */
+void adapt_frequency(struct timespec start, struct timespec finish, double uperiod) {
+	double elapsed = (finish.tv_sec - start.tv_sec) * 1e6;
+	elapsed += (finish.tv_nsec - start.tv_nsec) / 1e3;
+	if (elapsed < uperiod) {
+		useconds_t uperiod_sleep = uperiod - elapsed;
+		usleep(uperiod_sleep);
+	}
 }

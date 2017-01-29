@@ -1,26 +1,27 @@
 /**
  * @file logger.c
- * @brief      Implémentation d'un logger.
- * @author     Steven Liatti et Matthieu Constant
- * @bug        Pas de bugs connus
- * @date       Janvier 2017
+ * @brief      Implementation of a basic logger.
+ *
+ * @author     Steven Liatti
+ * @author     Orphée Antoniadis
+ * @author     Raed Abdennadher
+ * @bug        No known bugs.
+ * @date       January 29, 2017
  * @version    1.0
  */
 
 #include "../inc/logger.h"
 
 /**
- * @brief      Fonction qui écris sur le stream renseigné et selon un niveau de
- *             log fixé, les arguments variables donnés.
+ * @brief      This function write on the stream in argument and with a log
+ *             level the variables arguments.
  *
- * @param[in]  log_level  Le niveau de log (voir logger.h)
- * @param      stream     Le flux sur lequel écrire (fichier, sortie/erreur
- *                        standard).
- * @param      format     Le string à écrire.
- * @param[in]  <unnamed>  Une liste variable d'arguments (comme pour printf par
- *                        exemple).
+ * @param[in]  log_level  The log level (see logger.h)
+ * @param      stream     The stream (file, stdout/stderr).
+ * @param      format     The string to write.
+ * @param[in]  <unnamed>  A variable list of arguments.
  */
-void logger(int log_level, FILE *stream, char *format, ...) {
+void logger(int log_level, FILE* stream, char* format, ...) {
 	va_list arguments;
 	va_start(arguments, format);
 

@@ -1,9 +1,12 @@
 /**
  * @file logger.h
- * @brief      Header du logger.
- * @author     Steven Liatti et Matthieu Constant
- * @bug        Pas de bugs connus
- * @date       Janvier 2017
+ * @brief      Header of a basic logger.
+ *
+ * @author     Steven Liatti
+ * @author     Orphée Antoniadis
+ * @author     Raed Abdennadher
+ * @bug        No known bugs.
+ * @date       January 29, 2017
  * @version    1.0
  */
 
@@ -11,20 +14,19 @@
 #define _LOGGER_H_
 
 #include "machine.h"
-#include <stdarg.h>
 
 /**
- * @brief      Les différents niveaux de log prédéfinis
+ * @brief      The differents log level.
  */
 #define LOG_ERROR 0
 #define LOG_WARNING 1
 #define LOG_DEBUG 2
 
 /**
- * @brief      Le niveau actuel de log.
+ * @brief      The actual log level.
  */
-#define LOG_LEVEL LOG_DEBUG
+#define LOG_LEVEL LOG_ERROR
 
-void logger(int log_level, FILE *stream, char *format, ...);
+void logger(int log_level, FILE* stream, char* format, ...);
 
 #endif
