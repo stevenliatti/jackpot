@@ -14,11 +14,11 @@ void* display_thread(void* arg) {
 	// printf("Insert a coin to start the game...\n");
 	while (!machine->stop_game) {
 
-		logger(LOG_DEBUG, stderr, "In display_thread, after first while\n");
+		logger(LOG_DEBUG, stderr, "In display_thread, before first cond\n");
 		pthread_mutex_lock(&(machine->mutex));
-		if (machine->first_game) {
+		while (machine->first_game) {
 			pthread_cond_wait(&(machine->cond), &(machine->mutex));
-			logger(LOG_DEBUG, stderr, "display_thread deblocked\n");
+			logger(LOG_DEBUG, stderr, "display_thread deblocked first cond\n");
 		}
 		pthread_mutex_unlock(&(machine->mutex));
 
@@ -27,15 +27,16 @@ void* display_thread(void* arg) {
 		printf("Insert a coin to start the game...\n");
 		printf("\e[2J");
 
-		logger(LOG_DEBUG, stderr, "In display_thread, after first while\n");
+		logger(LOG_DEBUG, stderr, "In display_thread, before second cond\n");
 		pthread_mutex_lock(&(machine->mutex));
-		if (!machine->started) {
+		while (!machine->started) {
 			pthread_cond_wait(&(machine->cond), &(machine->mutex));
-			logger(LOG_DEBUG, stderr, "display_thread deblocked\n");
+			logger(LOG_DEBUG, stderr, "display_thread deblocked second cond\n");
 		}
 		pthread_mutex_unlock(&(machine->mutex));
 
-		while (machine->started) {
+		logger(LOG_DEBUG, stderr, "display_thread, machine->started : %d\n", machine->started);
+		while (machine->started && !machine->stop_game) {
 			printf("\e[1;1H");
 			printf("Game started!\n");
 			int pos = 1;
@@ -47,6 +48,7 @@ void* display_thread(void* arg) {
 			}
 			printf("\n");
 		}
+		logger(LOG_DEBUG, stderr, "display_thread, after while machine started\n");
 
 		// revoir peut-être la comparaison, faire qqch de plus générique
 		// carrément la déplacer dans control en fait, c'est pas le job de display
@@ -77,10 +79,11 @@ void* display_thread(void* arg) {
 			printf("You won %d coins\n", won_coins);
 			printf("%d coins left in the machine...\n", machine->cash);
 		}
+		logger(LOG_DEBUG, stderr, "display_thread, end of first while, machine->stop_game : %d\n", machine->stop_game);
 	}
 
 	printf("Come again soon!\n");
 	
-	
+	logger(LOG_DEBUG, stderr, "display_thread terminated\n");
 	return NULL;
 }

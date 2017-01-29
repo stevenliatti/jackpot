@@ -1,27 +1,27 @@
 #include "../inc/control.h"
 
 void insert_coin(machine_t* machine) {
-	logger(LOG_DEBUG, stderr, "In insert_coin\n");
+	logger(LOG_DEBUG, stderr, "control_thread, In insert_coin\n");
 	//if (!(machine->started)) {
 		pthread_mutex_lock(&(machine->mutex));
 		machine->first_game = true;
 		machine->started = true;
-		logger(LOG_DEBUG, stderr, "machine->started = true\n");
+		logger(LOG_DEBUG, stderr, "control_thread, machine->started = true\n");
 		for (int i = 0; i < machine->wheels_nb; i++) {
 			machine->wheels[i]->rolling = true;
 			machine->wheels[i]->value = 0;
 		}
 		pthread_cond_broadcast(&(machine->cond));
-		logger(LOG_DEBUG, stderr, "after pthread_cond_broadcast\n");
+		logger(LOG_DEBUG, stderr, "control_thread, after pthread_cond_broadcast\n");
 		pthread_mutex_unlock(&(machine->mutex));
 	//}
-	logger(LOG_DEBUG, stderr, "all wheel rolling\n");
+	logger(LOG_DEBUG, stderr, "control_thread, all wheel rolling\n");
 	machine->cash++;
-	logger(LOG_DEBUG, stderr, "Coin inserted.\n");
+	logger(LOG_DEBUG, stderr, "control_thread, Coin inserted.\n");
 }
 
 void stop_wheel(machine_t* machine) {
-	logger(LOG_DEBUG, stderr, "In stop_wheel\n");
+	logger(LOG_DEBUG, stderr, "control_thread, In stop_wheel\n");
 	if (machine->started) {
 		int cnt = 0;
 		while(!(machine->wheels[cnt]->rolling) && cnt < machine->wheels_nb) {
@@ -30,7 +30,7 @@ void stop_wheel(machine_t* machine) {
 		if (cnt != machine->wheels_nb) {
 			// pthread_mutex_lock(&(machine->mutex)); à revoir
 			machine->wheels[cnt]->rolling = false;
-			logger(LOG_DEBUG, stderr, "Wheel stopped.\n");
+			logger(LOG_DEBUG, stderr, "control_thread, Wheel stopped.\n");
 			if (cnt == machine->wheels_nb - 1) {
 
 				machine->started = false;
@@ -47,19 +47,19 @@ void stop_wheel(machine_t* machine) {
 }
 
 void exit_game(machine_t* machine) {
-	logger(LOG_DEBUG, stderr, "In exit_game\n");
+	logger(LOG_DEBUG, stderr, "control_thread, In exit_game\n");
 	pthread_mutex_lock(&(machine->mutex));
 	// ça parait paradoxal mais faut quand même mettre à true rolling
 	// sinon les threads wheel restent bloqué dans le while de la variable de condition
 	for (int i = 0; i < machine->wheels_nb; i++) {
 		machine->wheels[i]->rolling = true;
 	}
-	machine->started = false;
+	machine->started = true;
 	machine->stop_game = true;
 	pthread_cond_broadcast(&(machine->cond));
-	logger(LOG_DEBUG, stderr, "in exit_game, pthread_cond_broadcast\n");
+	logger(LOG_DEBUG, stderr, "control_thread, in exit_game, pthread_cond_broadcast\n");
 	pthread_mutex_unlock(&(machine->mutex));
-	logger(LOG_DEBUG, stderr, "Game terminated\n");
+	logger(LOG_DEBUG, stderr, "control_thread, Game terminated\n");
 }
 
 void* control_thread(void* arg) {
