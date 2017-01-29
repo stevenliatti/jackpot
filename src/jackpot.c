@@ -1,8 +1,7 @@
 /**
  * @file jackpot.c
- * @brief      Jackpot
- *
- *             This is Sparta !
+ * @brief      This is the main file of the program. It contain only the main
+ *             function.
  *
  * @author     Steven Liatti
  * @author     Orphée Antoniadis
@@ -17,17 +16,24 @@
 #include "../inc/display.h"
 #include "../inc/wheel.h"
 #include "../inc/logger.h"
-#include "../inc/timer.h"
-
-#define CHECK_ERR(expr, msg) if (expr) { fprintf(stderr, "%s\n", msg); return EXIT_FAILURE; }
-
-const int WHEELS_NB = 3;
 
 /**
- * @brief      This is the main function. It initialize variables, check
- *             arguments, launch threads, join them and free the memory in use.
+ * @brief      A cool define for check a expression and printf on stderr in case
+ *             of failure.
  *
- * @return     the code's exit of program
+ * @param      expr  The logical expression
+ * @param      msg   The message to print
+ *
+ * @return     EXIT_FAILURE in case of fail.
+ */
+#define CHECK_ERR(expr, msg) if (expr) { fprintf(stderr, "%s\n", msg); return EXIT_FAILURE; }
+
+/**
+ * @brief      This is the main function. It block the signals, initialize
+ *             variables, check arguments, launch threads, join them and free
+ *             the memory in use.
+ *
+ * @return     The code's exit of program.
  */
 int main() {
 	machine_t* machine = new_machine(WHEELS_NB);
@@ -43,9 +49,6 @@ int main() {
 	pthread_t th_display;
 	CHECK_ERR(pthread_create(&th_display, NULL, display_thread, machine), "pthread_create failed!");
 
-	// pthread_t th_timer;
-	// CHECK_ERR(pthread_create(&th_timer, NULL, timer_thread, machine), "pthread_create failed!");
-	
 	pthread_t th_wheels[WHEELS_NB];
 	for (int i = 0; i < WHEELS_NB; i++) {
 		CHECK_ERR(pthread_create(&th_wheels[i], NULL, wheel_thread, machine->wheels[i]), "pthread_create failed!");
@@ -57,9 +60,6 @@ int main() {
 	CHECK_ERR(pthread_join(th_display, NULL), "pthread_join failed!");
 	logger(LOG_WARNING, stderr, "after th_display join\n");
 
-	// CHECK_ERR(pthread_join(th_timer, NULL), "pthread_join failed!");
-	// logger(LOG_WARNING, stderr, "after th_timer join\n");
-	
 	for (int i = 0; i < WHEELS_NB; i++) {
 		CHECK_ERR(pthread_join(th_wheels[i], NULL), "pthread_join failed!");
 		logger(LOG_WARNING, stderr, "after th_wheels[%d] join\n", i);

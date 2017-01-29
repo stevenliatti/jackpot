@@ -4,7 +4,7 @@ void insert_coin(machine_t* machine) {
 	logger(LOG_DEBUG, stderr, "control_thread, In insert_coin\n");
 	//if (!(machine->started)) {
 		pthread_mutex_lock(&(machine->mutex));
-		machine->first_game = true;
+		machine->new_game = true;
 		machine->started = true;
 		logger(LOG_DEBUG, stderr, "control_thread, machine->started = true\n");
 		for (int i = 0; i < machine->wheels_nb; i++) {
@@ -43,7 +43,7 @@ void stop_wheel(machine_t* machine) {
 				alarm(0);
 				logger(LOG_DEBUG, stderr, "control_thread, stop_wheel, alarm reset to 0 again (third wheel)\n");
 				sleep(5);
-				machine->first_game = false;
+				machine->new_game = false;
 
 				pthread_mutex_lock(&(machine->mutex));
 				pthread_cond_broadcast(&(machine->cond));
