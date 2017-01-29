@@ -55,17 +55,17 @@ int main() {
 	}
 
 	CHECK_ERR(pthread_join(th_control, NULL), "pthread_join failed!");
-	logger(LOG_WARNING, stderr, "after th_control join\n");
+	logger(LOG_DEBUG, stderr, "after th_control join\n");
 
 	CHECK_ERR(pthread_join(th_display, NULL), "pthread_join failed!");
-	logger(LOG_WARNING, stderr, "after th_display join\n");
+	logger(LOG_DEBUG, stderr, "after th_display join\n");
 
 	for (int i = 0; i < WHEELS_NB; i++) {
 		CHECK_ERR(pthread_join(th_wheels[i], NULL), "pthread_join failed!");
-		logger(LOG_WARNING, stderr, "after th_wheels[%d] join\n", i);
+		logger(LOG_DEBUG, stderr, "after th_wheels[%d] join\n", i);
 	}
 
 	free_machine(machine);
-	logger(LOG_WARNING, stderr, "free_machine\n");
+	logger(LOG_DEBUG, stderr, "free_machine\n");
 	return EXIT_SUCCESS;
 }
