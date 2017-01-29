@@ -8,25 +8,40 @@ void* display_thread(void* arg) {
 	machine_t* machine = (machine_t*) arg;
 
 	//setbuf(stdout,0);
-	printf("\e[2J");
-	printf("\e[0;0H");
-	printf("Insert a coin to start the game...\n");
 
+	// printf("\e[2J");
+	// printf("\e[0;0H");
+	// printf("Insert a coin to start the game...\n");
 	while (!machine->stop_game) {
 
 		logger(LOG_DEBUG, stderr, "In display_thread, after first while\n");
 		pthread_mutex_lock(&(machine->mutex));
-		while (!machine->started) {
+		if (machine->first_game) {
 			pthread_cond_wait(&(machine->cond), &(machine->mutex));
+			logger(LOG_DEBUG, stderr, "display_thread deblocked\n");
 		}
 		pthread_mutex_unlock(&(machine->mutex));
 
-		printf("Game started!\n");
+		printf("\e[2J");
+		printf("\e[0;0H");
+		printf("Insert a coin to start the game...\n");
+		printf("\e[2J");
+
+		logger(LOG_DEBUG, stderr, "In display_thread, after first while\n");
+		pthread_mutex_lock(&(machine->mutex));
+		if (!machine->started) {
+			pthread_cond_wait(&(machine->cond), &(machine->mutex));
+			logger(LOG_DEBUG, stderr, "display_thread deblocked\n");
+		}
+		pthread_mutex_unlock(&(machine->mutex));
+
 		while (machine->started) {
+			printf("\e[1;1H");
+			printf("Game started!\n");
 			int pos = 1;
 			for (int i = 0; i < machine->wheels_nb; i++) {
 				printf("\e[3;%dH", pos);
-				printf("%d\n", machine->wheel[i]->value);
+				printf("%d\n", machine->wheels[i]->value);
 				usleep(33333); // 30 Hz
 				pos += 2;
 			}
@@ -35,19 +50,32 @@ void* display_thread(void* arg) {
 
 		// revoir peut-être la comparaison, faire qqch de plus générique
 		// carrément la déplacer dans control en fait, c'est pas le job de display
-		if (!machine->started) {
-			if (machine->wheel[0]->value == machine->wheel[1]->value && 
-				machine->wheel[1]->value == machine->wheel[2]->value) {
+		if (!machine->stop_game) {
+			int won_coins = 0;
+			if (machine->wheels[0]->value == machine->wheels[1]->value && 
+				machine->wheels[1]->value == machine->wheels[2]->value) {
+				won_coins = machine->cash / 2;
+				if (machine->cash == 1) {
+					won_coins = 1;
+				}
 				printf("JACKPOT!!\n");
 			}
-			else if (machine->wheel[0]->value == machine->wheel[1]->value || 
-					machine->wheel[0]->value == machine->wheel[2]->value || 
-					machine->wheel[1]->value == machine->wheel[2]->value) {
+			else if (machine->wheels[0]->value == machine->wheels[1]->value || 
+					machine->wheels[0]->value == machine->wheels[2]->value || 
+					machine->wheels[1]->value == machine->wheels[2]->value) {
+				won_coins = 2;
+				if (machine->cash == 1) {
+					won_coins = 1;
+				}
 				printf("Double win!\n");
 			}
 			else {
 				printf("You lost!\n");
 			}
+			
+			machine->cash -= won_coins;
+			printf("You won %d coins\n", won_coins);
+			printf("%d coins left in the machine...\n", machine->cash);
 		}
 	}
 

@@ -1,5 +1,3 @@
-#include "../inc/machine.h"
-#include "../inc/control.h"
 #include "../inc/wheel.h"
 
 void* wheel_thread(void* arg) {
@@ -18,11 +16,11 @@ void* wheel_thread(void* arg) {
 
 		while (!*wheel->stop_game && wheel->rolling) {
 			wheel->value = (wheel->value + 1) % 10;
-			logger(LOG_DEBUG, stderr, "wheel value for id %d : %d\n", wheel->id, wheel->value);
+		//	logger(LOG_DEBUG, stderr, "wheel value for id %d : %d\n", wheel->id, wheel->value);
 			usleep(wheel->sleep);
 		}
 		logger(LOG_DEBUG, stderr, "Stop rolling in wheel_thread %d, wheel value : %d\n", wheel->id, wheel->value);
 	}
-
+	logger(LOG_DEBUG, stderr, "wheel_thread %d terminate\n", wheel->id);
 	return NULL;
 }

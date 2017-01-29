@@ -16,6 +16,11 @@
  */
 #define BASE_SLEEP 4000000
 
+/**
+ * @brief      Coins initial value
+ */
+#define COINS 3
+
 typedef struct {
 	int value;
 	int id;
@@ -27,11 +32,12 @@ typedef struct {
 } wheel_t;
 
 typedef struct {
-	wheel_t** wheel;
+	wheel_t** wheels;
 	int wheels_nb;
 	int cash;
 	bool started;
 	bool stop_game;
+	bool first_game;
 	pthread_mutex_t mutex;
 	pthread_cond_t cond;
 } machine_t;

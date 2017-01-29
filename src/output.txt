@@ -1,0 +1,69 @@
+sleep 4000000 pour wheels 0
+sleep 2000000 pour wheels 1
+sleep 1000000 pour wheels 2
+In display_thread, after first while
+Use SIGTSTP to insert a coin, SIGINT to stop a wheel and SIGQUIT to quit.
+reminders :
+SIGTSTP : CTRL + Z
+SIGINT : CTRL + C
+SIGQUIT : CTRL + \
+kill -s <SIGNAL> 10918
+In wheel_thread 0
+from wheel_thread 0, wheel->stop_game : 0
+In wheel_thread 0, after first while
+In display_thread, after first while
+In wheel_thread 1
+from wheel_thread 1, wheel->stop_game : 0
+In wheel_thread 1, after first while
+In wheel_thread 2
+from wheel_thread 2, wheel->stop_game : 0
+In wheel_thread 2, after first while
+In insert_coin
+machine->started = true
+after pthread_cond_broadcast
+all wheel rolling
+Coin inserted.
+display_thread deblocked
+signal receive in wheel_thread 1
+from wheel_thread 1, wheel->stop_game (2) : 0
+signal receive in wheel_thread 0
+from wheel_thread 0, wheel->stop_game (2) : 0
+signal receive in wheel_thread 2
+from wheel_thread 2, wheel->stop_game (2) : 0
+In stop_wheel
+Wheel stopped.
+In stop_wheel
+Wheel stopped.
+In stop_wheel
+Wheel stopped.
+In display_thread, after first while
+Stop rolling in wheel_thread 2, wheel value : 1
+In wheel_thread 2, after first while
+Stop rolling in wheel_thread 1, wheel value : 1
+In wheel_thread 1, after first while
+Stop rolling in wheel_thread 0, wheel value : 1
+In wheel_thread 0, after first while
+display_thread deblocked
+In display_thread, after first while
+In exit_game
+in exit_game, pthread_cond_broadcast
+Game terminated
+display_thread deblocked
+after th_control join
+after th_display join
+signal receive in wheel_thread 2
+from wheel_thread 2, wheel->stop_game (2) : 1
+Stop rolling in wheel_thread 2, wheel value : 1
+wheel_thread 2 terminate
+signal receive in wheel_thread 1
+from wheel_thread 1, wheel->stop_game (2) : 1
+Stop rolling in wheel_thread 1, wheel value : 1
+wheel_thread 1 terminate
+signal receive in wheel_thread 0
+from wheel_thread 0, wheel->stop_game (2) : 1
+Stop rolling in wheel_thread 0, wheel value : 1
+wheel_thread 0 terminate
+after th_wheels[0] join
+after th_wheels[1] join
+after th_wheels[2] join
+free_machine

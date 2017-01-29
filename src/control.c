@@ -1,37 +1,45 @@
-#include "../inc/machine.h"
 #include "../inc/control.h"
 
 void insert_coin(machine_t* machine) {
 	logger(LOG_DEBUG, stderr, "In insert_coin\n");
-	if (!(machine->started)) {
+	//if (!(machine->started)) {
 		pthread_mutex_lock(&(machine->mutex));
+		machine->first_game = true;
 		machine->started = true;
 		logger(LOG_DEBUG, stderr, "machine->started = true\n");
 		for (int i = 0; i < machine->wheels_nb; i++) {
-			machine->wheel[i]->rolling = true;
+			machine->wheels[i]->rolling = true;
+			machine->wheels[i]->value = 0;
 		}
 		pthread_cond_broadcast(&(machine->cond));
 		logger(LOG_DEBUG, stderr, "after pthread_cond_broadcast\n");
 		pthread_mutex_unlock(&(machine->mutex));
-		logger(LOG_DEBUG, stderr, "all wheel rolling\n");
-		machine->cash++;
-		logger(LOG_DEBUG, stderr, "Coin inserted.\n");
-	}
+	//}
+	logger(LOG_DEBUG, stderr, "all wheel rolling\n");
+	machine->cash++;
+	logger(LOG_DEBUG, stderr, "Coin inserted.\n");
 }
 
 void stop_wheel(machine_t* machine) {
 	logger(LOG_DEBUG, stderr, "In stop_wheel\n");
 	if (machine->started) {
 		int cnt = 0;
-		while(!(machine->wheel[cnt]->rolling) && cnt < machine->wheels_nb) {
+		while(!(machine->wheels[cnt]->rolling) && cnt < machine->wheels_nb) {
 			cnt++;
 		} 
 		if (cnt != machine->wheels_nb) {
 			// pthread_mutex_lock(&(machine->mutex)); à revoir
-			machine->wheel[cnt]->rolling = false;
+			machine->wheels[cnt]->rolling = false;
 			logger(LOG_DEBUG, stderr, "Wheel stopped.\n");
 			if (cnt == machine->wheels_nb - 1) {
+
 				machine->started = false;
+				sleep(5);
+				machine->first_game = false;
+
+				pthread_mutex_lock(&(machine->mutex));
+				pthread_cond_broadcast(&(machine->cond));
+				pthread_mutex_unlock(&(machine->mutex));
 			}
 			// pthread_mutex_unlock(&(machine->mutex));
 		}
@@ -44,7 +52,7 @@ void exit_game(machine_t* machine) {
 	// ça parait paradoxal mais faut quand même mettre à true rolling
 	// sinon les threads wheel restent bloqué dans le while de la variable de condition
 	for (int i = 0; i < machine->wheels_nb; i++) {
-		machine->wheel[i]->rolling = true;
+		machine->wheels[i]->rolling = true;
 	}
 	machine->started = false;
 	machine->stop_game = true;
