@@ -44,6 +44,11 @@
 #define REACTION_TIME 3
 
 /**
+ * @brief      Time (in seconds) after a new game.
+ */
+#define END_GAME 5
+
+/**
  * @brief      The period for a display at the good frequency.
  */
 #define DISPLAY_PERIOD 33333
