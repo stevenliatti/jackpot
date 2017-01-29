@@ -12,7 +12,7 @@
 
 #include "../inc/display.h"
 
-void end_game(machine_t* machine);
+void won_coins_compute(machine_t* machine);
 void adapt_frequency(struct timespec start, struct timespec finish, double uperiod);
 
 /**
