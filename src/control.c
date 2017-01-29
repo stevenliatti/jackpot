@@ -1,27 +1,41 @@
 #include "../inc/control.h"
 
+/**
+ * @brief      This function will be called if a user inserts a coin (if SIGTSTP is send).
+ *					It sets the booleans of our structure to true and send a broadcast
+ *					to all the thread waiting on machine->cond.
+ *
+ * @param      machine   A pointer on a struct machine_t
+ *
+ * @return     NULL
+ */
 void insert_coin(machine_t* machine) {
 	logger(LOG_DEBUG, stderr, "control_thread, In insert_coin\n");
-	//if (!(machine->started)) {
-		pthread_mutex_lock(&(machine->mutex));
-		machine->new_game = true;
-		machine->started = true;
-		logger(LOG_DEBUG, stderr, "control_thread, machine->started = true\n");
-		for (int i = 0; i < machine->wheels_nb; i++) {
-			machine->wheels[i]->rolling = true;
-			machine->wheels[i]->value = 0;
-		}
-		pthread_cond_broadcast(&(machine->cond));
-		logger(LOG_DEBUG, stderr, "control_thread, after pthread_cond_broadcast\n");
-		alarm(REACTION_TIME);
-		logger(LOG_DEBUG, stderr, "control_thread, insert_coin, alarm set for %d sec\n", REACTION_TIME);
-		pthread_mutex_unlock(&(machine->mutex));
-	//}
+	pthread_mutex_lock(&(machine->mutex));
+	machine->new_game = true;
+	machine->started = true;
+	logger(LOG_DEBUG, stderr, "control_thread, machine->started = true\n");
+	for (int i = 0; i < machine->wheels_nb; i++) {
+		machine->wheels[i]->rolling = true;
+		machine->wheels[i]->value = 0;
+	}
+	pthread_cond_broadcast(&(machine->cond));
+	logger(LOG_DEBUG, stderr, "control_thread, after pthread_cond_broadcast\n");
+	alarm(REACTION_TIME);
+	logger(LOG_DEBUG, stderr, "control_thread, insert_coin, alarm set for %d sec\n", REACTION_TIME);
+	pthread_mutex_unlock(&(machine->mutex));
 	logger(LOG_DEBUG, stderr, "control_thread, all wheel rolling\n");
 	machine->cash++;
 	logger(LOG_DEBUG, stderr, "control_thread, Coin inserted.\n");
 }
 
+/**
+ * @brief      This function will be called if a user stops a wheel
+ *
+ * @param      machine   A pointer on a struct machine_t
+ *
+ * @return     NULL
+ */
 void stop_wheel(machine_t* machine) {
 	logger(LOG_DEBUG, stderr, "control_thread, In stop_wheel\n");
 	if (machine->started) {
@@ -30,9 +44,8 @@ void stop_wheel(machine_t* machine) {
 		int cnt = 0;
 		while(!(machine->wheels[cnt]->rolling) && cnt < machine->wheels_nb) {
 			cnt++;
-		} 
+		}
 		if (cnt != machine->wheels_nb) {
-			// pthread_mutex_lock(&(machine->mutex)); // pas nécessaire finalement
 			machine->wheels[cnt]->rolling = false;
 			alarm(REACTION_TIME);
 			logger(LOG_DEBUG, stderr, "control_thread, stop_wheel, alarm restarted with %d sec\n", REACTION_TIME);
@@ -49,16 +62,22 @@ void stop_wheel(machine_t* machine) {
 				pthread_cond_broadcast(&(machine->cond));
 				pthread_mutex_unlock(&(machine->mutex));
 			}
-			// pthread_mutex_unlock(&(machine->mutex)); // pas nécessaire finalement
 		}
 	}
 }
 
+/**
+ * @brief      This function will be called if a user wants to stop the machine (if SIGQUIT is send).
+ *					It sets the booleans of our structure to true and send a broadcast
+ *					to all the thread waiting on machine->cond.
+ *
+ * @param      machine   A pointer on a struct machine_t
+ *
+ * @return     NULL
+ */
 void exit_game(machine_t* machine) {
 	logger(LOG_DEBUG, stderr, "control_thread, In exit_game\n");
 	pthread_mutex_lock(&(machine->mutex));
-	// ça parait paradoxal mais faut quand même mettre à true rolling
-	// sinon les threads wheel restent bloqué dans le while de la variable de condition
 	for (int i = 0; i < machine->wheels_nb; i++) {
 		machine->wheels[i]->rolling = true;
 	}
@@ -70,6 +89,15 @@ void exit_game(machine_t* machine) {
 	logger(LOG_DEBUG, stderr, "control_thread, Game terminated\n");
 }
 
+/**
+ * @brief      This function is the control thread. This thread will wait to
+ *					receive a signal. When it does, it will call the function related to
+ *					the signal or send an error if the signal is incorrect.
+ *
+ * @param      arg   A void pointer, in reality a pointer on a struct machine_t
+ *
+ * @return     NULL
+ */
 void* control_thread(void* arg) {
 	machine_t* machine = (machine_t*) arg;
 	sigset_t mask, maskold;
@@ -83,7 +111,7 @@ void* control_thread(void* arg) {
 	do {
 		sigwait(&mask, &sig);
 		switch (sig) {
-			case SIGTSTP: 
+			case SIGTSTP:
 				insert_coin(machine);
 				break;
 			case SIGINT:
