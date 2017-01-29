@@ -57,8 +57,16 @@ void* display_thread(void* arg) {
 			printf("Game started!\n");
 			int pos = 1;
 			for (int i = 0; i < machine->wheels_nb; i++) {
-				printf("\e[3;%dH", pos);
-				printf("%d\n", machine->wheels[i]->value);
+				//pthread_mutex_lock(&(machine->wheels[i]->mutex_value));
+				if (machine->wheels[i]->rolling) {
+
+					printf("\e[3;%dH", pos);
+					//pthread_mutex_lock(&(machine->wheels[i]->mutex_value));
+					int x = machine->wheels[i]->value;
+					//pthread_mutex_unlock(&(machine->wheels[i]->mutex_value));
+					printf("%d\n", x);
+				}
+				//pthread_mutex_unlock(&(machine->wheels[i]->mutex_value));
 				pos += 2;
 			}
 			printf("\n");

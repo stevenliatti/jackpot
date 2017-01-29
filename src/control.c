@@ -44,7 +44,9 @@ void stop_wheel(machine_t* machine) {
 			cnt++;
 		}
 		if (cnt != machine->wheels_nb) {
+			pthread_mutex_lock(&(machine->wheels[cnt]->mutex_value));
 			machine->wheels[cnt]->rolling = false;
+			pthread_mutex_unlock(&(machine->wheels[cnt]->mutex_value));
 			alarm(REACTION_TIME);
 			logger(LOG_DEBUG, stderr, "control_thread, stop_wheel, alarm restarted with %d sec\n", REACTION_TIME);
 			if (cnt == machine->wheels_nb - 1) {

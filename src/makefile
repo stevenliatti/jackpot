@@ -8,7 +8,7 @@ EXEC=jackpot
 all: $(EXEC) mostlyclean
 
 $(EXEC): $(OBJ)
-	$(CC) $^ -o $(EXEC) $(LDFLAGS)
+	$(CC) $^ -o $(EXEC) $(LDFLAGS) -lrt
 
 %o: %c
 	$(CC) $(CFLAGS) -c $^

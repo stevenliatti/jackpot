@@ -41,6 +41,7 @@ machine_t* new_machine(int size) {
 		machine->wheels[i]->sleep = sleep;
 		machine->wheels[i]->mutex = &(machine->mutex);
 		machine->wheels[i]->cond = &(machine->cond);
+		pthread_mutex_init(&(machine->wheels[i]->mutex_value), NULL);
 	}
 	return machine;
 }
@@ -53,6 +54,7 @@ machine_t* new_machine(int size) {
 void free_machine(machine_t* machine) {
 	for (int i = 0; i < machine->wheels_nb; i++) {
 		free(machine->wheels[i]);
+		pthread_mutex_destroy(&(machine->wheels[i]->mutex_value));
 	}
 	pthread_mutex_destroy(&(machine->mutex));
 	pthread_cond_destroy(&(machine->cond));

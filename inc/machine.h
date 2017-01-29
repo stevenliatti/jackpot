@@ -68,6 +68,7 @@ typedef struct {
 	                         * pthread condition. */
 	pthread_cond_t* cond; /*!< A pointer on the machine condition, work in collaboration with
 	                       * the pthread mutex. */
+	pthread_mutex_t mutex_value;
 } wheel_t;
 
 /**
