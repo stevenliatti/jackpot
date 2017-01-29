@@ -68,7 +68,7 @@ void* display_thread(void* arg) {
 
 		logger(LOG_DEBUG, stderr, "display_thread, after while machine started\n");
 		if (!machine->stop_game) {
-			end_game(machine);
+			won_coins_compute(machine);
 		}
 		logger(LOG_DEBUG, stderr, "display_thread, end of first while, machine->stop_game : %d\n", machine->stop_game);
 	}
@@ -82,7 +82,7 @@ void* display_thread(void* arg) {
  *
  * @param      machine  A pointer on the machine
  */
-void end_game(machine_t* machine) {
+void won_coins_compute(machine_t* machine) {
 	int won_coins = 0;
 	if (machine->wheels[0]->value == machine->wheels[1]->value && 
 		machine->wheels[1]->value == machine->wheels[2]->value) {

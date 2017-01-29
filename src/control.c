@@ -48,7 +48,6 @@ void stop_wheel(machine_t* machine) {
 			alarm(REACTION_TIME);
 			logger(LOG_DEBUG, stderr, "control_thread, stop_wheel, alarm restarted with %d sec\n", REACTION_TIME);
 			if (cnt == machine->wheels_nb - 1) {
-
 				machine->started = false;
 				alarm(0);
 				logger(LOG_DEBUG, stderr, "control_thread, stop_wheel, alarm reset to 0 again (third wheel)\n");
