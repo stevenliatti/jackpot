@@ -1,6 +1,10 @@
 #include "../inc/wheel.h"
 
 void* wheel_thread(void* arg) {
+	sigset_t mask, maskold;
+	sigfillset(&mask);
+	pthread_sigmask(SIG_SETMASK, &mask, &maskold);
+	
 	wheel_t* wheel = (wheel_t*) arg;
 	logger(LOG_DEBUG, stderr, "In wheel_thread %d\n", wheel->id);
 	logger(LOG_DEBUG, stderr, "from wheel_thread %d, wheel->stop_game : %d\n", wheel->id, *wheel->stop_game);

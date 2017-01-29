@@ -14,12 +14,17 @@
 /**
  * @brief      120 ms of sleep duration
  */
-#define BASE_SLEEP 4000000
+#define BASE_SLEEP 120000
 
 /**
  * @brief      Coins initial value
  */
 #define COINS 3
+
+/**
+ * @brief      Time (in seconds) before a wheel stop by herself
+ */
+#define REACTION_TIME 3
 
 typedef struct {
 	int value;

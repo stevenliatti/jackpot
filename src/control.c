@@ -13,6 +13,8 @@ void insert_coin(machine_t* machine) {
 		}
 		pthread_cond_broadcast(&(machine->cond));
 		logger(LOG_DEBUG, stderr, "control_thread, after pthread_cond_broadcast\n");
+		alarm(REACTION_TIME);
+		logger(LOG_DEBUG, stderr, "control_thread, insert_coin, alarm set for %d sec\n", REACTION_TIME);
 		pthread_mutex_unlock(&(machine->mutex));
 	//}
 	logger(LOG_DEBUG, stderr, "control_thread, all wheel rolling\n");
@@ -23,17 +25,23 @@ void insert_coin(machine_t* machine) {
 void stop_wheel(machine_t* machine) {
 	logger(LOG_DEBUG, stderr, "control_thread, In stop_wheel\n");
 	if (machine->started) {
+		alarm(0);
+		logger(LOG_DEBUG, stderr, "control_thread, stop_wheel, alarm reset to 0\n");
 		int cnt = 0;
 		while(!(machine->wheels[cnt]->rolling) && cnt < machine->wheels_nb) {
 			cnt++;
 		} 
 		if (cnt != machine->wheels_nb) {
-			// pthread_mutex_lock(&(machine->mutex)); à revoir
+			// pthread_mutex_lock(&(machine->mutex)); // pas nécessaire finalement
 			machine->wheels[cnt]->rolling = false;
+			alarm(REACTION_TIME);
+			logger(LOG_DEBUG, stderr, "control_thread, stop_wheel, alarm restarted with %d sec\n", REACTION_TIME);
 			logger(LOG_DEBUG, stderr, "control_thread, Wheel stopped.\n");
 			if (cnt == machine->wheels_nb - 1) {
 
 				machine->started = false;
+				alarm(0);
+				logger(LOG_DEBUG, stderr, "control_thread, stop_wheel, alarm reset to 0 again (third wheel)\n");
 				sleep(5);
 				machine->first_game = false;
 
@@ -41,7 +49,7 @@ void stop_wheel(machine_t* machine) {
 				pthread_cond_broadcast(&(machine->cond));
 				pthread_mutex_unlock(&(machine->mutex));
 			}
-			// pthread_mutex_unlock(&(machine->mutex));
+			// pthread_mutex_unlock(&(machine->mutex)); // pas nécessaire finalement
 		}
 	}
 }
@@ -75,10 +83,19 @@ void* control_thread(void* arg) {
 	do {
 		sigwait(&mask, &sig);
 		switch (sig) {
-			case SIGTSTP : insert_coin(machine); break;
-			case SIGINT : stop_wheel(machine); break;
-			case SIGQUIT : exit_game(machine); break;
-			default : logger(LOG_DEBUG, stderr, "Invalid signal.\n"); break;
+			case SIGTSTP: 
+				insert_coin(machine);
+				break;
+			case SIGINT:
+			case SIGALRM:
+				stop_wheel(machine);
+				break;
+			case SIGQUIT:
+				exit_game(machine);
+				break;
+			default:
+				logger(LOG_DEBUG, stderr, "Invalid signal.\n");
+				break;
 		}
 	} while (sig != SIGQUIT);
 	return NULL;
