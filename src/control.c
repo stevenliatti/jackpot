@@ -26,10 +26,10 @@ void insert_coin(machine_t* machine) {
 
 /**
  * @brief      This function will be called if a user stops a wheel. An alarm is
- *             set to REACTION_TIME for stop the current wheel after this time.
+ *             set to REACTION_TIME to stop the current wheel after this time.
  *             It turn the rolling boolean at false and start a new alarm for
  *             the next wheel. If all the wheels are stopped, the machine stop
- *             hersel too. It's here where the sleep at the end of game is
+ *             itself to. It's here where the sleep at the end of game is
  *             called.
  *
  * @param      machine  A pointer on a struct machine_t.
